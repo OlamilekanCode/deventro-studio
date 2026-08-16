@@ -1,3 +1,14 @@
+"use client";
+
+import { type FormEvent, useState } from "react";
+
+const CONTACT_EMAIL = "support@deventro.site";
+
+type ContactStatus = {
+  tone: "idle" | "pending" | "success" | "error";
+  message: string;
+};
+
 const services = [
   {
     number: "01",
@@ -71,11 +82,58 @@ const capabilities = [
   "AI integrations",
 ];
 
+function getField(formData: FormData, name: string) {
+  return String(formData.get(name) || "").trim();
+}
+
 function ArrowIcon() {
   return <span aria-hidden="true">↗</span>;
 }
 
 export default function Home() {
+  const [contactStatus, setContactStatus] = useState<ContactStatus>({
+    tone: "idle",
+    message: "",
+  });
+
+  async function handleContactSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    const formData = new FormData(event.currentTarget);
+
+    if (getField(formData, "website")) {
+      return;
+    }
+
+    setContactStatus({
+      tone: "pending",
+      message: "Sending your project brief...",
+    });
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Unable to send message");
+      }
+
+      form.reset();
+      setContactStatus({
+        tone: "success",
+        message: "Message sent. I will reply with a practical next step.",
+      });
+    } catch {
+      setContactStatus({
+        tone: "error",
+        message: `Something went wrong. You can email ${CONTACT_EMAIL} directly.`,
+      });
+    }
+  }
+
   return (
     <main>
       <header className="site-header">
@@ -90,11 +148,12 @@ export default function Home() {
           <a href="#services">Services</a>
           <a href="#work">Work</a>
           <a href="#process">Process</a>
+          <a href="#contact">Contact</a>
         </nav>
 
         <a
           className="header-cta"
-          href="mailto:adebukolaolamilekan123@gmail.com?subject=Software%20development%20project"
+          href="#contact"
         >
           Discuss a project <ArrowIcon />
         </a>
@@ -115,7 +174,7 @@ export default function Home() {
           <div className="hero-actions">
             <a
               className="button button-primary"
-              href="mailto:adebukolaolamilekan123@gmail.com?subject=Tell%20me%20about%20your%20project"
+              href="#contact"
             >
               Tell me about your project <ArrowIcon />
             </a>
@@ -312,21 +371,112 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="final-cta">
-        <p className="eyebrow light">
-          <span /> Have a project in mind?
-        </p>
-        <h2>Let&apos;s turn it into something people can use.</h2>
-        <p>
-          Share the problem, your timeline and where you are today. I&apos;ll
-          reply with a practical next step.
-        </p>
-        <a
-          className="button button-light"
-          href="mailto:adebukolaolamilekan123@gmail.com?subject=New%20project%20for%20DevEntro%20Studio"
-        >
-          Start a conversation <ArrowIcon />
-        </a>
+      <section className="contact-section" id="contact">
+        <div className="contact-copy">
+          <p className="eyebrow light">
+            <span /> Have a project in mind?
+          </p>
+          <h2>Let&apos;s turn it into something people can use.</h2>
+          <p>
+            Share the problem, your timeline and where you are today. I&apos;ll
+            reply with a practical next step.
+          </p>
+          <div className="contact-details" aria-label="Contact details">
+            <span>Based in Lagos</span>
+            <span>Working worldwide</span>
+            <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+          </div>
+        </div>
+
+        <form className="contact-form" onSubmit={handleContactSubmit}>
+          <div className="form-grid">
+            <label>
+              <span>Name</span>
+              <input name="name" type="text" autoComplete="name" required />
+            </label>
+            <label>
+              <span>Email</span>
+              <input name="email" type="email" autoComplete="email" required />
+            </label>
+          </div>
+
+          <label>
+            <span>Company or brand</span>
+            <input name="company" type="text" autoComplete="organization" />
+          </label>
+
+          <div className="form-grid">
+            <label>
+              <span>Project type</span>
+              <select name="projectType" defaultValue="" required>
+                <option value="" disabled>
+                  Select one
+                </option>
+                <option>Business website</option>
+                <option>Custom web application</option>
+                <option>API or integration</option>
+                <option>AI-enabled workflow</option>
+                <option>Ongoing product support</option>
+              </select>
+            </label>
+            <label>
+              <span>Timeline</span>
+              <select name="timeline" defaultValue="" required>
+                <option value="" disabled>
+                  Select one
+                </option>
+                <option>As soon as possible</option>
+                <option>Within 1 month</option>
+                <option>1-3 months</option>
+                <option>3+ months</option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            <span>Budget range</span>
+            <select name="budget" defaultValue="">
+              <option value="">Select one</option>
+              <option>Under $1,000</option>
+              <option>$1,000 - $3,000</option>
+              <option>$3,000 - $7,500</option>
+              <option>$7,500+</option>
+              <option>Not sure yet</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Project details</span>
+            <textarea
+              name="message"
+              rows={6}
+              placeholder="What are you trying to build, improve or automate?"
+              required
+            />
+          </label>
+
+          <label className="form-trap" aria-hidden="true">
+            <span>Website</span>
+            <input name="website" type="text" tabIndex={-1} />
+          </label>
+
+          <button
+            className="button button-primary form-submit"
+            disabled={contactStatus.tone === "pending"}
+            type="submit"
+          >
+            {contactStatus.tone === "pending"
+              ? "Sending..."
+              : "Send project brief"}{" "}
+            <ArrowIcon />
+          </button>
+
+          {contactStatus.message && (
+            <p className={`form-status ${contactStatus.tone}`} role="status">
+              {contactStatus.message}
+            </p>
+          )}
+        </form>
       </section>
 
       <footer>
@@ -352,7 +502,7 @@ export default function Home() {
           >
             X / Twitter
           </a>
-          <a href="mailto:adebukolaolamilekan123@gmail.com">Email</a>
+          <a href={`mailto:${CONTACT_EMAIL}`}>Email</a>
         </div>
       </footer>
     </main>

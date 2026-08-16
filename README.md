@@ -23,8 +23,9 @@ DevEntro Studio presents services, selected work, technical capabilities and a c
 - Responsive landing page for desktop and mobile
 - Services, selected work, process and capability sections
 - Static export configured with `output: "export"`
+- Contact form powered by a Cloudflare Pages Function and Resend
 - Custom favicon in `public/favicon.svg`
-- Email-based contact calls to action
+- Email delivered to `support@deventro.site`
 - Preview screenshot captured from the live deployment
 
 ## Run locally
@@ -60,6 +61,15 @@ Cloudflare Pages settings:
 - Framework preset: `Next.js (Static HTML Export)`
 - Custom domain: `dev.deventro.site`
 
+The contact form posts to `functions/api/contact.js`, then sends mail through Resend.
+
+Cloudflare setup:
+
+- Add `RESEND_API_KEY` as an encrypted Pages secret.
+- Verify `deventro.site` in Resend.
+- Allow `website@deventro.site` as the sender address.
+- Keep Cloudflare Email Routing forwarding `support@deventro.site` to the inbox that receives client inquiries.
+
 ## Project structure
 
 ```text
@@ -67,6 +77,8 @@ app/
   globals.css      Global styles and responsive layout
   layout.tsx       Page metadata and root layout
   page.tsx         Landing page content and sections
+functions/
+  api/contact.js   Contact form endpoint for Cloudflare Pages
 public/
   deventro-studio-home.png   README preview screenshot
   favicon.svg                Site favicon
@@ -79,8 +91,7 @@ tsconfig.json      TypeScript configuration
 
 - Main copy, services, projects and links: `app/page.tsx`
 - Colors, spacing and responsive behavior: `app/globals.css`
+- Contact form email handling: `functions/api/contact.js`
 - Page title and meta description: `app/layout.tsx`
 - Static export settings: `next.config.ts`
 - README preview image: `public/deventro-studio-home.png`
-
-The contact buttons currently open an email to `adebukolaolamilekan123@gmail.com`. Update the `mailto:` links in `app/page.tsx` when the business email changes.
