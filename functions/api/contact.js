@@ -1,6 +1,9 @@
 const CONTACT_EMAIL = "support@deventro.site";
 const FROM_EMAIL = "DevEntro Website <website@deventro.site>";
 const RESEND_ENDPOINT = "https://api.resend.com/emails";
+const TURNSTILE_ENDPOINT =
+  "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+const TURNSTILE_HOSTNAME = "dev.deventro.site";
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX = 5;
 const recentSubmissions = new Map();
@@ -61,6 +64,58 @@ function isRateLimited(request) {
   return false;
 }
 
+async function verifyTurnstile({ request, env, token }) {
+  if (!env.TURNSTILE_SECRET_KEY) {
+    return {
+      ok: false,
+      error: json({ error: "Turnstile is not configured." }, 503),
+    };
+  }
+
+  if (!token) {
+    return {
+      ok: false,
+      error: json({ error: "Please complete the security check." }, 400),
+    };
+  }
+
+  const verificationData = new FormData();
+  verificationData.append("secret", env.TURNSTILE_SECRET_KEY);
+  verificationData.append("response", token);
+  verificationData.append("remoteip", getClientIp(request));
+
+  const verificationResponse = await fetch(TURNSTILE_ENDPOINT, {
+    method: "POST",
+    body: verificationData,
+  });
+
+  if (!verificationResponse.ok) {
+    return {
+      ok: false,
+      error: json({ error: "Unable to verify security check." }, 502),
+    };
+  }
+
+  const verification = await verificationResponse.json();
+
+  if (
+    !verification.success ||
+    verification.hostname !== TURNSTILE_HOSTNAME
+  ) {
+    return {
+      ok: false,
+      error: json(
+        { error: "Security verification failed. Please try again." },
+        403,
+      ),
+    };
+  }
+
+  return {
+    ok: true,
+  };
+}
+
 export async function onRequestPost({ request, env }) {
   if (!env.RESEND_API_KEY) {
     return json({ error: "Resend API key is not configured." }, 503);
@@ -74,6 +129,17 @@ export async function onRequestPost({ request, env }) {
 
   if (clean(formData.get("website"))) {
     return json({ ok: true });
+  }
+
+  const turnstileToken = cleanLine(formData.get("cf-turnstile-response"));
+  const turnstile = await verifyTurnstile({
+    request,
+    env,
+    token: turnstileToken,
+  });
+
+  if (!turnstile.ok) {
+    return turnstile.error;
   }
 
   const name = cleanLine(formData.get("name"));

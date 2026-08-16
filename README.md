@@ -23,7 +23,7 @@ DevEntro Studio presents services, selected work, technical capabilities and a c
 - Responsive landing page for desktop and mobile
 - Services, selected work, process and capability sections
 - Static export configured with `output: "export"`
-- Contact form powered by a Cloudflare Pages Function and Resend
+- Contact form powered by a Cloudflare Pages Function, Resend and Cloudflare Turnstile
 - Custom favicon in `public/favicon.svg`
 - Email delivered to `support@deventro.site`
 - Preview screenshot captured from the live deployment
@@ -66,8 +66,10 @@ The contact form posts to `functions/api/contact.js`, then sends mail through Re
 Cloudflare setup:
 
 - Add `RESEND_API_KEY` as an encrypted Pages secret.
+- Add `TURNSTILE_SECRET_KEY` as an encrypted Pages secret.
 - Verify `deventro.site` in Resend.
 - Allow `website@deventro.site` as the sender address.
+- Use `YOUR_PUBLIC_SITE_KEY` as the public Turnstile site key.
 - Keep Cloudflare Email Routing forwarding `support@deventro.site` to the inbox that receives client inquiries.
 
 ## Project structure

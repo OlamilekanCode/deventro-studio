@@ -775,6 +775,11 @@ nav a:hover {
   position: absolute;
 }
 
+.turnstile-widget {
+  min-height: 65px;
+  overflow: hidden;
+}
+
 .form-submit {
   border: 0;
   cursor: pointer;

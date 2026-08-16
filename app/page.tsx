@@ -1,8 +1,10 @@
 "use client";
 
 import { type FormEvent, useState } from "react";
+import Script from "next/script";
 
 const CONTACT_EMAIL = "support@deventro.site";
+const TURNSTILE_SITE_KEY = "0x4AAAAAAERMoEacDOZDDdcO";
 
 type ContactStatus = {
   tone: "idle" | "pending" | "success" | "error";
@@ -122,6 +124,13 @@ export default function Home() {
       }
 
       form.reset();
+      (
+        window as Window & {
+          turnstile?: {
+            reset: () => void;
+          };
+        }
+      ).turnstile?.reset();
       setContactStatus({
         tone: "success",
         message: "Message sent. I will reply with a practical next step.",
@@ -136,6 +145,11 @@ export default function Home() {
 
   return (
     <main>
+      <Script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+        strategy="afterInteractive"
+      />
+
       <header className="site-header">
         <a className="brand" href="#top" aria-label="DevEntro Studio home">
           <span className="brand-mark">D</span>
@@ -459,6 +473,12 @@ export default function Home() {
             <span>Website</span>
             <input name="website" type="text" tabIndex={-1} />
           </label>
+
+          <div
+            className="turnstile-widget cf-turnstile"
+            data-sitekey={TURNSTILE_SITE_KEY}
+            data-theme="light"
+          />
 
           <button
             className="button button-primary form-submit"
