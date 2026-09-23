@@ -42,6 +42,33 @@ button:focus-visible {
   outline-offset: 3px;
 }
 
+.scroll-progress {
+  background: linear-gradient(90deg, #2b6e5b, var(--mint-bright));
+  height: 3px;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  transform-origin: 0 50%;
+  z-index: 60;
+}
+
+/* Arrow nudge on hover for every link or button that carries one. */
+a > span[aria-hidden="true"],
+button > span[aria-hidden="true"] {
+  display: inline-block;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+a:hover > span[aria-hidden="true"],
+button:not(:disabled):hover > span[aria-hidden="true"] {
+  transform: translate(2px, -2px);
+}
+
+.text-link:hover > span[aria-hidden="true"] {
+  transform: translateY(3px);
+}
+
 .skip-link {
   background: var(--forest);
   color: white;
@@ -423,13 +450,11 @@ nav a:hover {
 .chip-one {
   left: 1%;
   top: 175px;
-  transform: rotate(-5deg);
 }
 
 .chip-two {
   bottom: 55px;
   right: 0;
-  transform: rotate(4deg);
 }
 
 .proof-strip {
@@ -518,6 +543,7 @@ nav a:hover {
 .service-card {
   border-bottom: 1px solid var(--line);
   border-right: 1px solid var(--line);
+  transition: background-color 0.3s;
   min-height: 325px;
   padding: 28px;
   position: relative;
@@ -529,7 +555,21 @@ nav a:hover {
   font-size: 10px;
 }
 
+.service-card:hover {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.service-card:hover .service-icon {
+  background: var(--forest);
+  color: var(--mint);
+  transform: rotate(-6deg) scale(1.06);
+}
+
 .service-icon {
+  transition:
+    background-color 0.3s,
+    color 0.3s,
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   align-items: center;
   background: #dfece5;
   border-radius: 50%;
@@ -624,10 +664,16 @@ nav a:hover {
 }
 
 .project-main h3 {
+  transition: color 0.25s, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   font-family: var(--font-display), Georgia, serif;
   font-size: 35px;
   font-weight: 400;
   margin: 0 0 13px;
+}
+
+.project-row:hover .project-main h3 {
+  color: #2b6e5b;
+  transform: translateX(6px);
 }
 
 .project-main p {
@@ -1317,6 +1363,7 @@ footer > div a:hover {
   *,
   *::before,
   *::after {
+    animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
 }

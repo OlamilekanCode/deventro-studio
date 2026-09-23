@@ -1,5 +1,6 @@
 import ContactForm from "./_components/ContactForm";
 import { ArrowIcon, Icon } from "./_components/Icons";
+import { HeroVisual, Reveal, ScrollProgress } from "./_components/Motion";
 import {
   capabilities,
   CONTACT_EMAIL,
@@ -48,6 +49,7 @@ function Eyebrow({
 export default function Home() {
   return (
     <>
+      <ScrollProgress />
       <a className="skip-link" href="#main">
         Skip to content
       </a>
@@ -72,76 +74,33 @@ export default function Home() {
       <main id="main">
         <section className="hero" id="top">
           <div className="hero-copy">
-            <Eyebrow>Software development for ambitious businesses</Eyebrow>
-            <h1>
+            <Reveal immediate>
+              <Eyebrow>Software development for ambitious businesses</Eyebrow>
+            </Reveal>
+            <Reveal as="h1" immediate delay={0.08}>
               From a rough idea to a <em>working product.</em>
-            </h1>
-            <p className="hero-lede">
+            </Reveal>
+            <Reveal as="p" className="hero-lede" immediate delay={0.18}>
               I&apos;m Aliameen, a full-stack developer who designs and builds
               websites, custom platforms, backend systems and AI-enabled
               workflows—so you can stop working around your tools and start
               growing with them.
-            </p>
-            <div className="hero-actions">
+            </Reveal>
+            <Reveal className="hero-actions" immediate delay={0.28}>
               <a className="button button-primary" href="#contact">
                 Tell me about your project <ArrowIcon />
               </a>
               <a className="text-link" href="#work">
                 See selected work <span aria-hidden="true">↓</span>
               </a>
-            </div>
-            <p className="availability">
+            </Reveal>
+            <Reveal as="p" className="availability" immediate delay={0.38}>
               <span className="pulse" aria-hidden="true" />
               Available for selected projects worldwide
-            </p>
+            </Reveal>
           </div>
 
-          <div className="hero-visual" aria-hidden="true">
-            <div className="visual-topline">
-              <span>PRODUCT DELIVERY</span>
-              <span className="visual-status">● ACTIVE</span>
-            </div>
-            <div className="visual-window">
-              <div className="visual-title">
-                <span className="window-icon">D</span>
-                <div>
-                  <strong>Your next product</strong>
-                  <small>Designed, built and shipped</small>
-                </div>
-              </div>
-              <div className="progress-track">
-                <span />
-              </div>
-              <div className="milestones">
-                <div className="complete">
-                  <b>01</b>
-                  <span>Scope & strategy</span>
-                  <i>✓</i>
-                </div>
-                <div className="complete">
-                  <b>02</b>
-                  <span>Design & prototype</span>
-                  <i>✓</i>
-                </div>
-                <div className="current">
-                  <b>03</b>
-                  <span>Build & integrate</span>
-                  <i>→</i>
-                </div>
-                <div>
-                  <b>04</b>
-                  <span>Test & launch</span>
-                  <i>○</i>
-                </div>
-              </div>
-            </div>
-            <div className="code-chip chip-one">
-              API <b>200 OK</b>
-            </div>
-            <div className="code-chip chip-two">
-              BUILD <b>✓ PASSED</b>
-            </div>
-          </div>
+          <HeroVisual />
         </section>
 
         <ul className="proof-strip" aria-label="Working principles">
@@ -151,7 +110,7 @@ export default function Home() {
         </ul>
 
         <section className="section work" id="work">
-          <div className="section-heading work-heading">
+          <Reveal className="section-heading work-heading">
             <div>
               <Eyebrow>Selected work</Eyebrow>
               <h2>Built beyond the mockup.</h2>
@@ -160,11 +119,11 @@ export default function Home() {
               Real products across publishing, education, travel and developer
               tooling—each one designed, built and shipped end to end.
             </p>
-          </div>
+          </Reveal>
 
           <div className="project-list">
             {projects.map((project, index) => (
-              <article className="project-row" key={project.title}>
+              <Reveal as="article" className="project-row" key={project.title}>
                 <span className="project-index">{pad(index)}</span>
                 <div className="project-main">
                   <p className="project-category">{project.category}</p>
@@ -190,7 +149,7 @@ export default function Home() {
                     <span className="private-note">Details available on request</span>
                   )}
                 </div>
-              </article>
+              </Reveal>
             ))}
           </div>
 
@@ -205,7 +164,7 @@ export default function Home() {
         </section>
 
         <section className="section services" id="services">
-          <div className="section-heading">
+          <Reveal className="section-heading">
             <Eyebrow>What I build</Eyebrow>
             <h2>Software designed around the outcome.</h2>
             <p>
@@ -214,11 +173,16 @@ export default function Home() {
               scenes. I start with the problem and recommend the smallest thing
               that solves it well.
             </p>
-          </div>
+          </Reveal>
 
           <div className="service-grid">
             {services.map((service, index) => (
-              <article className="service-card" key={service.title}>
+              <Reveal
+                as="article"
+                className="service-card"
+                delay={index * 0.08}
+                key={service.title}
+              >
                 <span className="service-number">{pad(index)}</span>
                 <div className="service-icon">
                   <Icon name={service.icon} />
@@ -230,24 +194,24 @@ export default function Home() {
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
-              </article>
+              </Reveal>
             ))}
           </div>
         </section>
 
         <section className="section process" id="process">
-          <div className="process-heading">
+          <Reveal className="process-heading">
             <Eyebrow light>How it works</Eyebrow>
             <h2>A clear path from problem to launch.</h2>
-          </div>
+          </Reveal>
           <ol className="process-grid">
             {processSteps.map((step, index) => (
-              <li key={step.title}>
+              <Reveal as="li" delay={index * 0.1} key={step.title}>
                 <b>{pad(index)}</b>
                 <h3>{step.title}</h3>
                 <p>{step.body}</p>
                 <p className="step-output">{step.output}</p>
-              </li>
+              </Reveal>
             ))}
           </ol>
         </section>
@@ -257,7 +221,7 @@ export default function Home() {
             <Eyebrow>About</Eyebrow>
             <h2>One developer, from first call to launch.</h2>
           </div>
-          <div className="about-body">
+          <Reveal className="about-body" delay={0.1}>
             <p>
               DevEntro Studio is the software practice of Aliameen Fatunbi, a
               full-stack developer based in Lagos. You work directly with the
@@ -275,30 +239,30 @@ export default function Home() {
                 <li key={capability}>{capability}</li>
               ))}
             </ul>
-          </div>
+          </Reveal>
         </section>
 
         <section className="section faq" id="faq">
-          <div className="section-heading">
+          <Reveal className="section-heading">
             <Eyebrow>Questions</Eyebrow>
             <h2>Before we start.</h2>
             <p>
               Anything else? Ask in the form below or email{" "}
               <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
             </p>
-          </div>
-          <div className="faq-list">
+          </Reveal>
+          <Reveal className="faq-list">
             {faqs.map((faq) => (
               <details key={faq.question}>
                 <summary>{faq.question}</summary>
                 <p>{faq.answer}</p>
               </details>
             ))}
-          </div>
+          </Reveal>
         </section>
 
         <section className="contact-section" id="contact">
-          <div className="contact-copy">
+          <Reveal className="contact-copy">
             <Eyebrow light>Have a project in mind?</Eyebrow>
             <h2>Let&apos;s turn it into something people can use.</h2>
             <p>
@@ -310,9 +274,11 @@ export default function Home() {
               <span>Based in Lagos · Working worldwide</span>
               <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
             </div>
-          </div>
+          </Reveal>
 
-          <ContactForm />
+          <Reveal delay={0.12}>
+            <ContactForm />
+          </Reveal>
         </section>
       </main>
 
