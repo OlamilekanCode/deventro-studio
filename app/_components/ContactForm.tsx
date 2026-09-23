@@ -6,6 +6,7 @@ import {
   budgets,
   CONTACT_EMAIL,
   projectTypes,
+  REPLY_TIME,
   timelines,
   TURNSTILE_SITE_KEY,
 } from "../content";
@@ -98,7 +99,7 @@ export default function ContactForm() {
       form.reset();
       setStatus({
         tone: "success",
-        message: "Message sent. I'll reply with a practical next step.",
+        message: `Message sent. I'll reply ${REPLY_TIME}.`,
       });
     } catch (error) {
       setStatus({

@@ -445,6 +445,8 @@ nav a:hover {
 
 .proof-strip,
 .capability-list,
+.highlight-list,
+.deliverables,
 .process-grid,
 .tech-list {
   list-style: none;
@@ -548,11 +550,43 @@ nav a:hover {
 
 .service-card p {
   color: var(--ink-soft);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.75;
   margin: 0;
 }
 
+.deliverables {
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 8px;
+  margin-top: 22px;
+  padding: 18px 0 0;
+}
+
+.deliverables li,
+.highlight-list li {
+  color: #35695b;
+  font-size: 12px;
+  font-weight: 700;
+  padding-left: 18px;
+  position: relative;
+}
+
+.deliverables li::before,
+.highlight-list li::before {
+  color: #26b274;
+  content: "✓";
+  left: 0;
+  position: absolute;
+}
+
+.highlight-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin-top: 18px;
+  padding: 0;
+}
 
 .services {
   padding-top: 70px;
@@ -687,13 +721,13 @@ nav a:hover {
 .process-grid {
   border-left: 1px solid rgba(255, 255, 255, 0.16);
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   padding: 0;
 }
 
 .process-grid li {
   border-right: 1px solid rgba(255, 255, 255, 0.16);
-  padding: 34px 42px 40px;
+  padding: 34px 32px 40px;
 }
 
 .process-grid b {
@@ -711,25 +745,110 @@ nav a:hover {
 
 .process-grid p {
   color: #b7c6c2;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.75;
   margin: 0;
 }
 
-.capability-section {
+.process-grid .step-output {
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  color: var(--mint);
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 22px;
+  padding-top: 16px;
+}
+
+.about {
   align-items: start;
   display: grid;
   gap: 8vw;
   grid-template-columns: 0.8fr 1.2fr;
 }
 
-.capability-section h2 {
+.about h2 {
   font-family: var(--font-display), Georgia, serif;
   font-size: clamp(38px, 4vw, 60px);
   font-weight: 400;
   letter-spacing: -0.04em;
   line-height: 1.05;
   margin: 0;
+}
+
+.about-body > p {
+  color: var(--ink-soft);
+  font-size: 17px;
+  line-height: 1.8;
+  margin: 0 0 20px;
+  max-width: 640px;
+}
+
+.about-body h3 {
+  color: #53645f;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  margin: 38px 0 14px;
+  text-transform: uppercase;
+}
+
+.faq {
+  padding-top: 0;
+}
+
+.faq .section-heading a {
+  border-bottom: 1px solid currentColor;
+  color: var(--ink);
+}
+
+.faq-list {
+  border-top: 1px solid var(--line);
+}
+
+.faq-list details {
+  border-bottom: 1px solid var(--line);
+}
+
+.faq-list summary {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(20px, 2vw, 26px);
+  gap: 20px;
+  justify-content: space-between;
+  list-style: none;
+  min-height: 44px;
+  padding: 24px 0;
+}
+
+.faq-list summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-list summary::after {
+  color: #2b6e5b;
+  content: "+";
+  font-family: var(--font-sans), sans-serif;
+  font-size: 24px;
+  transition: transform 0.2s;
+}
+
+.faq-list details[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.faq-list summary:focus-visible {
+  outline: 2px solid #2b6e5b;
+  outline-offset: 3px;
+}
+
+.faq-list details p {
+  color: var(--ink-soft);
+  font-size: 15px;
+  line-height: 1.8;
+  margin: -6px 0 26px;
+  max-width: 760px;
 }
 
 .capability-list {
@@ -1014,8 +1133,16 @@ footer > div a:hover {
     padding: 0;
   }
 
-  .capability-section {
+  .about {
     grid-template-columns: 1fr;
+  }
+
+  .process-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .process-grid li {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
   }
 
   .contact-section {
