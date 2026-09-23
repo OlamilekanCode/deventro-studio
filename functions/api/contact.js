@@ -3,10 +3,30 @@ const FROM_EMAIL = "DevEntro Website <website@deventro.site>";
 const RESEND_ENDPOINT = "https://api.resend.com/emails";
 const TURNSTILE_ENDPOINT =
   "https://challenges.cloudflare.com/turnstile/v0/siteverify";
-const TURNSTILE_HOSTNAME = "dev.deventro.site";
+const DEFAULT_HOSTNAMES = ["dev.deventro.site"];
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX = 5;
+// Best effort only: this map lives in a single Worker isolate, so limits are
+// not shared across isolates or regions. Pair it with a Cloudflare WAF rate
+// limiting rule on /api/contact for a real limit.
 const recentSubmissions = new Map();
+
+function allowedHostnames(env) {
+  const configured = String(env.TURNSTILE_HOSTNAMES || "")
+    .split(",")
+    .map((hostname) => hostname.trim())
+    .filter(Boolean);
+
+  return configured.length ? configured : DEFAULT_HOSTNAMES;
+}
+
+function turnstileErrorMessage(codes = []) {
+  if (codes.includes("timeout-or-duplicate")) {
+    return "The security check expired. Please complete it again and resend.";
+  }
+
+  return "Security verification failed. Please try again.";
+}
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -98,10 +118,19 @@ async function verifyTurnstile({ request, env, token }) {
 
   const verification = await verificationResponse.json();
 
-  if (
-    !verification.success ||
-    verification.hostname !== TURNSTILE_HOSTNAME
-  ) {
+  if (!verification.success) {
+    console.warn("Turnstile rejected token", verification["error-codes"]);
+    return {
+      ok: false,
+      error: json(
+        { error: turnstileErrorMessage(verification["error-codes"]) },
+        403,
+      ),
+    };
+  }
+
+  if (!allowedHostnames(env).includes(verification.hostname)) {
+    console.warn("Turnstile hostname not allowed", verification.hostname);
     return {
       ok: false,
       error: json(
@@ -116,16 +145,23 @@ async function verifyTurnstile({ request, env, token }) {
   };
 }
 
-export async function onRequestPost({ request, env }) {
+async function handleContact({ request, env }) {
   if (!env.RESEND_API_KEY) {
-    return json({ error: "Resend API key is not configured." }, 503);
+    console.error("RESEND_API_KEY is not configured");
+    return json({ error: "The contact form is temporarily unavailable." }, 503);
   }
 
   if (isRateLimited(request)) {
     return json({ error: "Too many requests. Please try again shortly." }, 429);
   }
 
-  const formData = await request.formData();
+  let formData;
+
+  try {
+    formData = await request.formData();
+  } catch {
+    return json({ error: "Invalid form submission." }, 400);
+  }
 
   if (clean(formData.get("website"))) {
     return json({ ok: true });
@@ -183,7 +219,7 @@ export async function onRequestPost({ request, env }) {
     <p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>
   `;
 
-  const resendResponse = await fetch(RESEND_ENDPOINT, {
+  const resendResponse = await fetch(env.RESEND_ENDPOINT || RESEND_ENDPOINT, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${env.RESEND_API_KEY}`,
@@ -201,11 +237,20 @@ export async function onRequestPost({ request, env }) {
 
   if (!resendResponse.ok) {
     const details = await resendResponse.text();
-    console.error("Resend contact email failed", details);
-    return json({ error: "Unable to send message." }, 502);
+    console.error("Resend contact email failed", resendResponse.status, details);
+    return json({ error: "Your message could not be delivered." }, 502);
   }
 
   return json({ ok: true });
+}
+
+export async function onRequestPost(context) {
+  try {
+    return await handleContact(context);
+  } catch (error) {
+    console.error("Contact form failed", error);
+    return json({ error: "Something went wrong on our side." }, 500);
+  }
 }
 
 export function onRequestOptions() {
