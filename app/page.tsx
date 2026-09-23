@@ -1,530 +1,303 @@
-"use client";
+import ContactForm from "./_components/ContactForm";
+import { ArrowIcon, Icon } from "./_components/Icons";
+import { HeroVisual, Reveal, ScrollProgress } from "./_components/Motion";
+import {
+  capabilities,
+  CONTACT_EMAIL,
+  faqs,
+  GITHUB_URL,
+  pad,
+  principles,
+  processSteps,
+  projects,
+  REPLY_TIME,
+  services,
+  X_URL,
+} from "./content";
 
-import { type FormEvent, useState } from "react";
-import Script from "next/script";
-
-const CONTACT_EMAIL = "support@deventro.site";
-const TURNSTILE_SITE_KEY = "0x4AAAAAAERMoEacDOZDDdcO";
-
-type ContactStatus = {
-  tone: "idle" | "pending" | "success" | "error";
-  message: string;
-};
-
-const services = [
-  {
-    number: "01",
-    title: "Websites that win trust",
-    body: "Fast, responsive business websites and content platforms designed around a clear customer journey—not a generic template.",
-  },
-  {
-    number: "02",
-    title: "Custom web applications",
-    body: "Dashboards, booking systems, portals, internal tools and full-stack products shaped around how your business actually works.",
-  },
-  {
-    number: "03",
-    title: "APIs & integrations",
-    body: "Secure backends, authentication, databases, payments, webhooks and third-party services connected into one dependable system.",
-  },
-  {
-    number: "04",
-    title: "AI-enabled workflows",
-    body: "Practical AI features and automations that reduce repetitive work, organize information and help teams move faster.",
-  },
-];
-
-const projects = [
-  {
-    title: "DevEntro",
-    description:
-      "An admin-managed publishing and AI-tools discovery platform with content workflows, media storage, newsletter capture and SEO infrastructure.",
-    tech: "Next.js · TypeScript · Cloudflare D1/R2",
-    href: "https://deventro.site",
-    linkLabel: "View live site",
-  },
-  {
-    title: "Biometric Attendance",
-    description:
-      "A local-first school attendance platform combining fingerprint identification, QR attendance, reporting and student management.",
-    tech: "React · Node.js · PostgreSQL · .NET",
-    href: "https://github.com/OlamilekanCode/biometric-attendance-system",
-    linkLabel: "View on GitHub",
-  },
-  {
-    title: "TravelWorld",
-    description:
-      "A booking platform with authenticated reservation APIs, availability protection, customer booking history and cancellation flows.",
-    tech: "Next.js · Node.js · MongoDB · REST APIs",
-    href: null,
-    linkLabel: null,
-  },
-  {
-    title: "ReqBug",
-    description:
-      "An ephemeral webhook inspector for receiving, verifying and safely reproducing webhook requests during development.",
-    tech: "TypeScript · Cloudflare Workers · Webhooks",
-    href: "https://github.com/OlamilekanCode/ReqBug",
-    linkLabel: "View on GitHub",
-  },
-];
-
-const capabilities = [
-  "TypeScript",
-  "React",
-  "Next.js",
-  "Node.js",
-  "Express",
-  "NestJS",
-  "FastAPI",
-  "Laravel",
-  "PostgreSQL",
-  "MongoDB",
-  "Cloudflare",
-  "AI integrations",
-];
-
-function getField(formData: FormData, name: string) {
-  return String(formData.get(name) || "").trim();
+function Brand({ className = "" }: { className?: string }) {
+  return (
+    <a
+      className={`brand ${className}`}
+      href="#top"
+      aria-label="DevEntro Studio home"
+    >
+      <span className="brand-mark" aria-hidden="true">
+        D
+      </span>
+      <span>
+        DevEntro <b>Studio</b>
+      </span>
+    </a>
+  );
 }
 
-function ArrowIcon() {
-  return <span aria-hidden="true">↗</span>;
+function Eyebrow({
+  children,
+  light = false,
+}: {
+  children: React.ReactNode;
+  light?: boolean;
+}) {
+  return (
+    <p className={`eyebrow${light ? " light" : ""}`}>
+      <span aria-hidden="true" /> {children}
+    </p>
+  );
 }
 
 export default function Home() {
-  const [contactStatus, setContactStatus] = useState<ContactStatus>({
-    tone: "idle",
-    message: "",
-  });
-
-  async function handleContactSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    const form = event.currentTarget;
-    const formData = new FormData(event.currentTarget);
-
-    if (getField(formData, "website")) {
-      return;
-    }
-
-    setContactStatus({
-      tone: "pending",
-      message: "Sending your project brief...",
-    });
-
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Unable to send message");
-      }
-
-      form.reset();
-      (
-        window as Window & {
-          turnstile?: {
-            reset: () => void;
-          };
-        }
-      ).turnstile?.reset();
-      setContactStatus({
-        tone: "success",
-        message: "Message sent. I will reply with a practical next step.",
-      });
-    } catch {
-      setContactStatus({
-        tone: "error",
-        message: `Something went wrong. You can email ${CONTACT_EMAIL} directly.`,
-      });
-    }
-  }
-
   return (
-    <main>
-      <Script
-        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-        strategy="afterInteractive"
-      />
+    <>
+      <ScrollProgress />
+      <a className="skip-link" href="#main">
+        Skip to content
+      </a>
 
       <header className="site-header">
-        <a className="brand" href="#top" aria-label="DevEntro Studio home">
-          <span className="brand-mark">D</span>
-          <span>
-            DevEntro <b>Studio</b>
-          </span>
-        </a>
+        <Brand />
 
         <nav aria-label="Primary navigation">
-          <a href="#services">Services</a>
           <a href="#work">Work</a>
+          <a href="#services">Services</a>
           <a href="#process">Process</a>
+          <a href="#faq">FAQ</a>
           <a href="#contact">Contact</a>
         </nav>
 
-        <a
-          className="header-cta"
-          href="#contact"
-        >
-          Discuss a project <ArrowIcon />
+        <a className="header-cta" href="#contact">
+          <span className="cta-long">Discuss a project</span>
+          <span className="cta-short">Contact</span> <ArrowIcon />
         </a>
       </header>
 
-      <section className="hero" id="top">
-        <div className="hero-copy">
-          <p className="eyebrow">
-            <span /> Software development for ambitious businesses
-          </p>
-          <h1>
-            From a rough idea to a <em>working product.</em>
-          </h1>
-          <p className="hero-lede">
-            I design and build websites, custom platforms, backend systems and
-            AI-enabled workflows that solve real business problems.
-          </p>
-          <div className="hero-actions">
-            <a
-              className="button button-primary"
-              href="#contact"
-            >
-              Tell me about your project <ArrowIcon />
-            </a>
-            <a className="text-link" href="#work">
-              See selected work <span aria-hidden="true">↓</span>
-            </a>
+      <main id="main">
+        <section className="hero" id="top">
+          <div className="hero-copy">
+            <Reveal immediate>
+              <Eyebrow>Software development for ambitious businesses</Eyebrow>
+            </Reveal>
+            <Reveal as="h1" immediate delay={0.08}>
+              From a rough idea to a <em>working product.</em>
+            </Reveal>
+            <Reveal as="p" className="hero-lede" immediate delay={0.18}>
+              I&apos;m Aliameen, a full-stack developer who designs and builds
+              websites, custom platforms, backend systems and AI-enabled
+              workflows—so you can stop working around your tools and start
+              growing with them.
+            </Reveal>
+            <Reveal className="hero-actions" immediate delay={0.28}>
+              <a className="button button-primary" href="#contact">
+                Tell me about your project <ArrowIcon />
+              </a>
+              <a className="text-link" href="#work">
+                See selected work <span aria-hidden="true">↓</span>
+              </a>
+            </Reveal>
+            <Reveal as="p" className="availability" immediate delay={0.38}>
+              <span className="pulse" aria-hidden="true" />
+              Available for selected projects worldwide
+            </Reveal>
           </div>
-          <div className="availability">
-            <span className="pulse" aria-hidden="true" />
-            Available for selected projects worldwide
-          </div>
-        </div>
 
-        <div className="hero-visual" aria-label="Project delivery overview">
-          <div className="visual-topline">
-            <span>PRODUCT DELIVERY</span>
-            <span className="visual-status">● ACTIVE</span>
-          </div>
-          <div className="visual-window">
-            <div className="visual-title">
-              <span className="window-icon">D</span>
-              <div>
-                <strong>Your next product</strong>
-                <small>Designed, built and shipped</small>
-              </div>
-            </div>
-            <div className="progress-track">
-              <span />
-            </div>
-            <div className="milestones">
-              <div className="complete">
-                <b>01</b>
-                <span>Scope & strategy</span>
-                <i>✓</i>
-              </div>
-              <div className="complete">
-                <b>02</b>
-                <span>Design & prototype</span>
-                <i>✓</i>
-              </div>
-              <div className="current">
-                <b>03</b>
-                <span>Build & integrate</span>
-                <i>→</i>
-              </div>
-              <div>
-                <b>04</b>
-                <span>Test & launch</span>
-                <i>○</i>
-              </div>
-            </div>
-          </div>
-          <div className="code-chip chip-one">
-            API <b>200 OK</b>
-          </div>
-          <div className="code-chip chip-two">
-            BUILD <b>✓ PASSED</b>
-          </div>
-        </div>
-      </section>
+          <HeroVisual />
+        </section>
 
-      <section className="proof-strip" aria-label="Working principles">
-        <span>Based in Lagos</span>
-        <i />
-        <span>Working worldwide</span>
-        <i />
-        <span>Clear milestones</span>
-        <i />
-        <span>Maintainable handoff</span>
-      </section>
-
-      <section className="section services" id="services">
-        <div className="section-heading">
-          <p className="eyebrow">
-            <span /> What I build
-          </p>
-          <h2>Software designed around the outcome.</h2>
-          <p>
-            The right solution may be a focused website, a custom platform or
-            an integration behind the scenes. We start with the problem.
-          </p>
-        </div>
-
-        <div className="service-grid">
-          {services.map((service) => (
-            <article className="service-card" key={service.number}>
-              <span className="service-number">{service.number}</span>
-              <div className="service-icon" aria-hidden="true">
-                {service.number === "01"
-                  ? "◫"
-                  : service.number === "02"
-                    ? "⌘"
-                    : service.number === "03"
-                      ? "⌁"
-                      : "✦"}
-              </div>
-              <h3>{service.title}</h3>
-              <p>{service.body}</p>
-            </article>
+        <ul className="proof-strip" aria-label="Working principles">
+          {principles.map((principle) => (
+            <li key={principle}>{principle}</li>
           ))}
-        </div>
-      </section>
+        </ul>
 
-      <section className="section work" id="work">
-        <div className="section-heading work-heading">
-          <div>
-            <p className="eyebrow">
-              <span /> Selected work
-            </p>
-            <h2>Built beyond the mockup.</h2>
-          </div>
-          <p>
-            Real product work across publishing, education, travel and
-            developer infrastructure.
-          </p>
-        </div>
-
-        <div className="project-list">
-          {projects.map((project, index) => (
-            <article className="project-row" key={project.title}>
-              <span className="project-index">0{index + 1}</span>
-              <div className="project-main">
-                <h3>{project.title}</h3>
-                <p>{project.description}</p>
-              </div>
-              <div className="project-meta">
-                <span>{project.tech}</span>
-                {project.href && (
-                  <a href={project.href} target="_blank" rel="noreferrer">
-                    {project.linkLabel} <ArrowIcon />
-                  </a>
-                )}
-              </div>
-            </article>
-          ))}
-        </div>
-
-        <a
-          className="github-link"
-          href="https://github.com/OlamilekanCode"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Explore my GitHub profile <ArrowIcon />
-        </a>
-      </section>
-
-      <section className="section process" id="process">
-        <div className="section-heading process-heading">
-          <p className="eyebrow light">
-            <span /> How we work
-          </p>
-          <h2>A clear path from problem to launch.</h2>
-        </div>
-        <div className="process-grid">
-          <article>
-            <b>01</b>
-            <h3>Define</h3>
+        <section className="section work" id="work">
+          <Reveal className="section-heading work-heading">
+            <div>
+              <Eyebrow>Selected work</Eyebrow>
+              <h2>Built beyond the mockup.</h2>
+            </div>
             <p>
-              We clarify the business goal, users, essential features, timeline
-              and success criteria.
+              Real products across publishing, education, travel and developer
+              tooling—each one designed, built and shipped end to end.
             </p>
-          </article>
-          <article>
-            <b>02</b>
-            <h3>Build</h3>
-            <p>
-              You see progress in useful milestones while I design, develop and
-              connect the system.
-            </p>
-          </article>
-          <article>
-            <b>03</b>
-            <h3>Launch</h3>
-            <p>
-              We test the important journeys, deploy carefully and leave you
-              with a maintainable handoff.
-            </p>
-          </article>
-        </div>
-      </section>
+          </Reveal>
 
-      <section className="section capability-section">
-        <div>
-          <p className="eyebrow">
-            <span /> Technical capability
-          </p>
-          <h2>Modern tools, chosen for the job.</h2>
-        </div>
-        <div className="capability-list">
-          {capabilities.map((capability) => (
-            <span key={capability}>{capability}</span>
-          ))}
-        </div>
-      </section>
-
-      <section className="contact-section" id="contact">
-        <div className="contact-copy">
-          <p className="eyebrow light">
-            <span /> Have a project in mind?
-          </p>
-          <h2>Let&apos;s turn it into something people can use.</h2>
-          <p>
-            Share the problem, your timeline and where you are today. I&apos;ll
-            reply with a practical next step.
-          </p>
-          <div className="contact-details" aria-label="Contact details">
-            <span>Based in Lagos</span>
-            <span>Working worldwide</span>
-            <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
-          </div>
-        </div>
-
-        <form className="contact-form" onSubmit={handleContactSubmit}>
-          <div className="form-grid">
-            <label>
-              <span>Name</span>
-              <input name="name" type="text" autoComplete="name" required />
-            </label>
-            <label>
-              <span>Email</span>
-              <input name="email" type="email" autoComplete="email" required />
-            </label>
+          <div className="project-list">
+            {projects.map((project, index) => (
+              <Reveal as="article" className="project-row" key={project.title}>
+                <span className="project-index">{pad(index)}</span>
+                <div className="project-main">
+                  <p className="project-category">{project.category}</p>
+                  <h3>{project.title}</h3>
+                  <p>{project.description}</p>
+                  <ul className="highlight-list">
+                    {project.highlights.map((highlight) => (
+                      <li key={highlight}>{highlight}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="project-meta">
+                  <ul className="tech-list" aria-label="Technologies">
+                    {project.tech.map((tech) => (
+                      <li key={tech}>{tech}</li>
+                    ))}
+                  </ul>
+                  {project.href ? (
+                    <a href={project.href} target="_blank" rel="noreferrer">
+                      {project.linkLabel} <ArrowIcon />
+                    </a>
+                  ) : (
+                    <span className="private-note">Details available on request</span>
+                  )}
+                </div>
+              </Reveal>
+            ))}
           </div>
 
-          <label>
-            <span>Company or brand</span>
-            <input name="company" type="text" autoComplete="organization" />
-          </label>
-
-          <div className="form-grid">
-            <label>
-              <span>Project type</span>
-              <select name="projectType" defaultValue="" required>
-                <option value="" disabled>
-                  Select one
-                </option>
-                <option>Business website</option>
-                <option>Custom web application</option>
-                <option>API or integration</option>
-                <option>AI-enabled workflow</option>
-                <option>Ongoing product support</option>
-              </select>
-            </label>
-            <label>
-              <span>Timeline</span>
-              <select name="timeline" defaultValue="" required>
-                <option value="" disabled>
-                  Select one
-                </option>
-                <option>As soon as possible</option>
-                <option>Within 1 month</option>
-                <option>1-3 months</option>
-                <option>3+ months</option>
-              </select>
-            </label>
-          </div>
-
-          <label>
-            <span>Budget range</span>
-            <select name="budget" defaultValue="">
-              <option value="">Select one</option>
-              <option>Under $1,000</option>
-              <option>$1,000 - $3,000</option>
-              <option>$3,000 - $7,500</option>
-              <option>$7,500+</option>
-              <option>Not sure yet</option>
-            </select>
-          </label>
-
-          <label>
-            <span>Project details</span>
-            <textarea
-              name="message"
-              rows={6}
-              placeholder="What are you trying to build, improve or automate?"
-              required
-            />
-          </label>
-
-          <label className="form-trap" aria-hidden="true">
-            <span>Website</span>
-            <input name="website" type="text" tabIndex={-1} />
-          </label>
-
-          <div
-            className="turnstile-widget cf-turnstile"
-            data-sitekey={TURNSTILE_SITE_KEY}
-            data-theme="light"
-          />
-
-          <button
-            className="button button-primary form-submit"
-            disabled={contactStatus.tone === "pending"}
-            type="submit"
+          <a
+            className="github-link"
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noreferrer"
           >
-            {contactStatus.tone === "pending"
-              ? "Sending..."
-              : "Send project brief"}{" "}
-            <ArrowIcon />
-          </button>
+            Explore my GitHub profile <ArrowIcon />
+          </a>
+        </section>
 
-          {contactStatus.message && (
-            <p className={`form-status ${contactStatus.tone}`} role="status">
-              {contactStatus.message}
+        <section className="section services" id="services">
+          <Reveal className="section-heading">
+            <Eyebrow>What I build</Eyebrow>
+            <h2>Software designed around the outcome.</h2>
+            <p>
+              Not every problem needs a big platform. Sometimes it&apos;s a
+              focused website; sometimes it&apos;s an integration behind the
+              scenes. I start with the problem and recommend the smallest thing
+              that solves it well.
             </p>
-          )}
-        </form>
-      </section>
+          </Reveal>
+
+          <div className="service-grid">
+            {services.map((service, index) => (
+              <Reveal
+                as="article"
+                className="service-card"
+                delay={index * 0.08}
+                key={service.title}
+              >
+                <span className="service-number">{pad(index)}</span>
+                <div className="service-icon">
+                  <Icon name={service.icon} />
+                </div>
+                <h3>{service.title}</h3>
+                <p>{service.body}</p>
+                <ul className="deliverables">
+                  {service.deliverables.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+
+        <section className="section process" id="process">
+          <Reveal className="process-heading">
+            <Eyebrow light>How it works</Eyebrow>
+            <h2>A clear path from problem to launch.</h2>
+          </Reveal>
+          <ol className="process-grid">
+            {processSteps.map((step, index) => (
+              <Reveal as="li" delay={index * 0.1} key={step.title}>
+                <b>{pad(index)}</b>
+                <h3>{step.title}</h3>
+                <p>{step.body}</p>
+                <p className="step-output">{step.output}</p>
+              </Reveal>
+            ))}
+          </ol>
+        </section>
+
+        <section className="section about" id="about">
+          <div>
+            <Eyebrow>About</Eyebrow>
+            <h2>One developer, from first call to launch.</h2>
+          </div>
+          <Reveal className="about-body" delay={0.1}>
+            <p>
+              DevEntro Studio is the software practice of Aliameen Fatunbi, a
+              full-stack developer based in Lagos. You work directly with the
+              person designing and writing your code—no hand-offs, no account
+              managers, no guessing who is responsible.
+            </p>
+            <p>
+              I care about software that stays useful after launch: clear
+              structure, sensible security and documentation your team (or the
+              next developer) can actually follow.
+            </p>
+            <h3>Tools I use</h3>
+            <ul className="capability-list">
+              {capabilities.map((capability) => (
+                <li key={capability}>{capability}</li>
+              ))}
+            </ul>
+          </Reveal>
+        </section>
+
+        <section className="section faq" id="faq">
+          <Reveal className="section-heading">
+            <Eyebrow>Questions</Eyebrow>
+            <h2>Before we start.</h2>
+            <p>
+              Anything else? Ask in the form below or email{" "}
+              <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+            </p>
+          </Reveal>
+          <Reveal className="faq-list">
+            {faqs.map((faq) => (
+              <details key={faq.question}>
+                <summary>{faq.question}</summary>
+                <p>{faq.answer}</p>
+              </details>
+            ))}
+          </Reveal>
+        </section>
+
+        <section className="contact-section" id="contact">
+          <Reveal className="contact-copy">
+            <Eyebrow light>Have a project in mind?</Eyebrow>
+            <h2>Let&apos;s turn it into something people can use.</h2>
+            <p>
+              Share the problem, your timeline and where you are today.
+              I&apos;ll reply {REPLY_TIME} with honest feedback and a practical
+              next step—even if that means I&apos;m not the right fit.
+            </p>
+            <div className="contact-details">
+              <span>Based in Lagos · Working worldwide</span>
+              <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.12}>
+            <ContactForm />
+          </Reveal>
+        </section>
+      </main>
 
       <footer>
-        <a className="brand footer-brand" href="#top">
-          <span className="brand-mark">D</span>
-          <span>
-            DevEntro <b>Studio</b>
-          </span>
-        </a>
-        <p>Software development by Aliameen Fatunbi.</p>
+        <Brand className="footer-brand" />
+        <p>
+          © {new Date().getFullYear()} DevEntro Studio · Software development by
+          Aliameen Fatunbi.
+        </p>
         <div>
-          <a
-            href="https://github.com/OlamilekanCode"
-            target="_blank"
-            rel="noreferrer"
-          >
+          <a href={GITHUB_URL} target="_blank" rel="noreferrer">
             GitHub
           </a>
-          <a
-            href="https://x.com/olamiltechlife"
-            target="_blank"
-            rel="noreferrer"
-          >
+          <a href={X_URL} target="_blank" rel="noreferrer">
             X / Twitter
           </a>
           <a href={`mailto:${CONTACT_EMAIL}`}>Email</a>
         </div>
       </footer>
-    </main>
+    </>
   );
 }

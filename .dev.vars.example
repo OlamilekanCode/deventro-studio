@@ -1,0 +1,5 @@
+# Copy to .dev.vars for `npm run preview` (wrangler pages dev).
+RESEND_API_KEY=re_xxx
+TURNSTILE_SECRET_KEY=0x...
+# Comma-separated hostnames Turnstile tokens may come from.
+TURNSTILE_HOSTNAMES=dev.deventro.site
