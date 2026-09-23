@@ -267,7 +267,7 @@ export default function Home() {
             <h2>Let&apos;s turn it into something people can use.</h2>
             <p>
               Share the problem, your timeline and where you are today.
-              I&apos;ll reply {REPLY_TIME} with honest feedback and a practical
+              I&apos;ll reply {REPLY_TIME}{" "}with honest feedback and a practical
               next step—even if that means I&apos;m not the right fit.
             </p>
             <div className="contact-details">
