@@ -6,3 +6,6 @@ out/
 .dev.vars*
 .DS_Store
 npm-debug.log*
+.wrangler/
+!.dev.vars.example
+*.tsbuildinfo
