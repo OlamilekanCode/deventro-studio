@@ -276,9 +276,8 @@ export default function Home() {
             </div>
           </Reveal>
 
-          <Reveal delay={0.12}>
-            <ContactForm />
-          </Reveal>
+          {/* Not wrapped in Reveal: Turnstile must render in a visible, untransformed box. */}
+          <ContactForm />
         </section>
       </main>
 

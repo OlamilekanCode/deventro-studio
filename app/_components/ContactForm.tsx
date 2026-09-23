@@ -27,6 +27,8 @@ declare global {
   }
 }
 
+const MAX_TURNSTILE_RETRIES = 2;
+
 type ContactStatus = {
   tone: "idle" | "pending" | "success" | "error";
   message: string;
@@ -48,23 +50,46 @@ export default function ContactForm() {
       return;
     }
 
+    let failures = 0;
+    let retryTimer: number | undefined;
+
     widgetId.current = turnstile.render(widgetRef.current, {
       sitekey: TURNSTILE_SITE_KEY,
       theme: "light",
       "refresh-expired": "auto",
-      callback: (value: string) => setToken(value),
+      callback: (value: string) => {
+        failures = 0;
+        setToken(value);
+        setStatus((current) =>
+          current.tone === "error" ? { tone: "idle", message: "" } : current,
+        );
+      },
       "expired-callback": () => setToken(""),
-      "error-callback": () => {
+      "error-callback": (code: string) => {
         setToken("");
-        setStatus({
-          tone: "error",
-          message:
-            "The security check could not load. Refresh the page or email me directly.",
-        });
+        failures += 1;
+
+        // Transient failures are common (slow networks, tab switching), so
+        // retry quietly before asking the visitor to do anything.
+        if (failures <= MAX_TURNSTILE_RETRIES) {
+          retryTimer = window.setTimeout(
+            () => turnstile.reset(widgetId.current),
+            2000,
+          );
+        } else {
+          setStatus({
+            tone: "error",
+            message: `The security check failed (code ${code}). Refresh the page, try another browser or disable extensions, or email me directly.`,
+          });
+        }
+
+        // Returning true tells Turnstile the error was handled.
+        return true;
       },
     });
 
     return () => {
+      window.clearTimeout(retryTimer);
       turnstile.remove(widgetId.current);
       widgetId.current = undefined;
     };
