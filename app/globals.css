@@ -97,9 +97,7 @@ section[id] {
   gap: 24px;
   height: 84px;
   justify-content: space-between;
-  margin: 0 auto;
-  max-width: 1440px;
-  padding: 0 5vw;
+  padding: 0 max(5vw, calc((100vw - 1440px) / 2 + 5vw));
   position: sticky;
   top: 0;
   z-index: 50;
