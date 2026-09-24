@@ -4,6 +4,8 @@ const RESEND_ENDPOINT = "https://api.resend.com/emails";
 const TURNSTILE_ENDPOINT =
   "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 const DEFAULT_HOSTNAMES = ["dev.deventro.site"];
+// Turnstile tokens can be up to 2048 characters; never truncate them.
+const TURNSTILE_TOKEN_MAX_LENGTH = 2048;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX = 5;
 // Best effort only: this map lives in a single Worker isolate, so limits are
@@ -167,7 +169,13 @@ async function handleContact({ request, env }) {
     return json({ ok: true });
   }
 
-  const turnstileToken = cleanLine(formData.get("cf-turnstile-response"));
+  const turnstileToken = String(
+    formData.get("cf-turnstile-response") || "",
+  ).trim();
+
+  if (turnstileToken.length > TURNSTILE_TOKEN_MAX_LENGTH) {
+    return json({ error: "Invalid security check token." }, 400);
+  }
   const turnstile = await verifyTurnstile({
     request,
     env,
